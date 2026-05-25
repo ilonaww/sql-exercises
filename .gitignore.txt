@@ -1,9 +1,0 @@
-# Visual Studio / SQL Server tools
-.vs/
-*.sln
-*.slnx
-*.sqlproj
-
-# systemowe śmieci Windows
-Thumbs.db
-.DS_Store
