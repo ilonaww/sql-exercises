@@ -53,3 +53,15 @@ select a.City, count(DISTINCT a.CustomerID) as Customwers, isnull(sum(b.amount),
 from Customers a
 left join Orders b on b.CustomerID = a.CustomerID
 group by a.City
+
+-- Dla każdego miasta pokaż najlepszego klienta (TOP 1) wg wydatków
+with Citeis as (select a.City, a.Name as CustomerName, sum(b.Amount) as TotalSpent,
+ROW_NUMBER() Over( partition by City order by sum(b.Amount) DESC) as Nr
+from Customers a
+left join Orders b on a.CustomerID = b.CustomerID
+group by a.City, a.Name)
+
+select a.City, a.CustomerName, a.TotalSpent
+from Citeis a
+where Nr = 1
+
