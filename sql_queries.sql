@@ -25,7 +25,7 @@ from Products b
 left join Orders a on a.ProductID = b.ProductID
 group by b.ProductName
 
--- Pokaż, którzy klienci wydają WIĘCEJ niż średnia wartość wszystkich klientów
+-- Pokaż, którzy klienci wydają więcej niż średnia wartość wszystkich klientów
 with CustomerAmount as (select b.CustomerID, b.Name, sum(a.amount) as TotalAmount
 from Orders a
 left join Customers b on b.CustomerID = a.CustomerID
@@ -35,3 +35,21 @@ from CustomerAmount
 where TotalAmount > (select avg(TotalAmount) as AvgAmount from CustomerAmount)
 order by TotalAmount DESC
 
+-- Pokaż TOP 3 klientów według wydatków
+select TOP 3 a.Name as CustomerName, sum(ISNULL(b.amount,0)) as TotalSpent
+from Customers a
+left join Orders b on a.CustomerID = b.CustomerID
+group by a.CustomerID, a.Name
+order by TotalSpent DESC
+
+-- Pokaż klientów, którzy nie złożyli żadnego zamówienia
+select a.Name as CustomerName, a.City
+from Customers a
+left join Orders b on a.CustomerID = b.CustomerID
+where b.OrderID  is null
+
+-- Pokaż dla każdego miasta: ile klientów jest; ile wydali łącznie
+select a.City, count(DISTINCT a.CustomerID) as Customwers, isnull(sum(b.amount),0) as TotalAmount
+from Customers a
+left join Orders b on b.CustomerID = a.CustomerID
+group by a.City
