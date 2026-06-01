@@ -75,3 +75,14 @@ group by a.CustomerID, a.Name )
 select CustomerName, TotalSpent, Dense_Rank() over (order by TotalSpent DESC) as CustomerRank
 from CustomerTotal
 
+
+
+--Dla każdego klienta pokaż: miesiąc (i rok), łączną kwotę wydaną w danym miesiącu, wydatki z poprzedniego miesiąca, różnicę / porównanie (logicznie przez LAG)
+with CustomersTotal as (select a.CustomerID, a.Name as CustomerName, year(b.OrderDate) * 100 + month(b.OrderDate) as YearMonth, sum(b.Amount) as TotalSpent 
+from Customers a
+inner join Orders b on a.CustomerID = b.CustomerID
+group by year(b.OrderDate) * 100 + month(b.OrderDate), a.CustomerID, a.Name
+)
+
+select CustomerName, YearMonth, TotalSpent, lag(TotalSpent) over (PARTITION BY CustomerID order by YearMonth) as TotalSpentPreviousMonth
+from CustomersTotal
