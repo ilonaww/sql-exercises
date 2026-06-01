@@ -65,3 +65,13 @@ select a.City, a.CustomerName, a.TotalSpent
 from Citeis a
 where Nr = 1
 
+
+-- Policzenie dla każdego klienta ile wydał i nadanie rankingu (od największego wydatku)
+with CustomerTotal as (select a.CustomerID, a.Name as CustomerName, sum(b.Amount) as TotalSpent 
+from Customers a
+left join Orders b on a.CustomerID = b.CustomerID
+group by a.CustomerID, a.Name )
+
+select CustomerName, TotalSpent, Dense_Rank() over (order by TotalSpent DESC) as CustomerRank
+from CustomerTotal
+
