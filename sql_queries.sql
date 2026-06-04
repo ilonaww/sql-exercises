@@ -86,3 +86,13 @@ group by year(b.OrderDate) * 100 + month(b.OrderDate), a.CustomerID, a.Name
 
 select CustomerName, YearMonth, TotalSpent, lag(TotalSpent) over (PARTITION BY CustomerID order by YearMonth) as TotalSpentPreviousMonth
 from CustomersTotal
+
+
+--Dla każdego klienta pokaż ile wydał od początku historii do danego miesiąca
+with CustomerSum as (select a.CustomerID, a.Name as CustomerName, YEAR(b.OrderDate) * 100 + MONTH(b.OrderDate) as YearMonth, sum(b.Amount) as TotalSpent 
+from Customers a 
+left join Orders b on a.CustomerID = b.CustomerID
+group by a.CustomerID, a.Name, YEAR(b.OrderDate) * 100 + MONTH(b.OrderDate))
+
+select CustomerName, YearMonth, TotalSpent, sum(TotalSpent) over (partition by CustomerID order by YearMonth) as RunningTotal
+from CustomerSum
